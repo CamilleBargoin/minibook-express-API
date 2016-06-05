@@ -1,11 +1,30 @@
 var express = require('express');
 var database = require('./database.js');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+
+
+
+//
+// SESSIONS
+//
+
+var session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+// var sessionFileStore = require('session-file-store');
+// var ExpressSessionFileStore = sessionFileStore(session);
+
+// var fileStore = new ExpressSessionFileStore({
+//   ttl:3600,
+//   path:'./sessions'
+// });
 
 var app = express();
 
 
-app.use(require('body-parser').urlencoded({extended: true}));
+
+app.use(cookieParser());
+
 
 app.set('port', process.env.PORT || 3000);
 
@@ -13,7 +32,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
@@ -38,13 +57,44 @@ database.connect(urlDatabase, function(err) {
 });
 
 
+var users = require('./routes/users');
+
+
+
 var startServer = function() {
+
+  console.log("start server");
 
     app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "http://localhost:8080");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
+
+
+    app.use(session({
+      secret: '1a9b829823448061ed5931380efc6c6a',
+      resave: true,
+      saveUninitialized: true,
+      store: new MongoStore({
+        db: database.get(),
+        ttl: 60 * 60
+      })
+    }));
+
+    app.use(function (req, res, next) {
+
+      console.log(database);
+      req.db = database;
+      // req.session = session;
+      next();
+    });
+
+
+
+
+
+    app.use('/users', users);
 
 
     app.get('/getTasks', function(req, res){

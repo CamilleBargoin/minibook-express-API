@@ -17,8 +17,14 @@
   },
   "homepage": "https://github.com/CamilleBargoin/minibook-express-API#readme",
   "dependencies": {
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.15.1",
+    "connect-mongo": "^1.2.0",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-alpha.1",
     "express": "^4.13.4",
-    "mongodb": "^2.1.16"
+    "express-session": "^1.13.0",
+    "mongodb": "^2.1.16",
+    "session-file-store": "^0.2.0"
   }
 }
