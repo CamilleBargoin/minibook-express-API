@@ -95,7 +95,6 @@ router.post('/login', function(req, res, next) {
                     res.redirect("/");
                 }
                 else {
-
                     for (var i = 0; i < docs.length; i++) {
                         if (validPassword(req.body.password, docs[i].password)) {
                             loggedInUser = docs[i];
@@ -141,6 +140,71 @@ router.get('/secure', function(req, res, next) {
 });
 
 
+router.get('/:id', function(req, res, next) {
+    console.log("get user by id");
+
+    var db = req.db.get();
+    var collection = db.collection('users');
+
+    var mongo = require('mongodb');
+
+    collection.findOne({_id: new mongo.ObjectId(req.params.id)}, {fields: {firstname: 1, lastname: 1, email: 1}}, function(err, doc) {
+
+        if (!err ) {
+
+            res.json(doc);   
+        }
+        else {
+            console.log(err);
+            res.json({
+                error: "utilisateur introuvable"
+            });
+        }
+    });
+
+});
+
+
+router.post("/update", function(req, res, next) {
+    console.log("upate user");
+
+    if (req.body && req.body.userId && req.body.sessionId) {
+
+        findSession(req.body.sessionId, req.db, function(session) {
+            if (session) {
+
+                var db = req.db.get();
+                var collection = db.collection('users');
+                var mongo = require('mongodb');
+
+                collection.findOneAndUpdate({
+                    _id: new mongo.ObjectId(req.body.userId)
+                }, {
+                    $set: req.body.updatedFields
+                }, {
+                    returnNewDocument: true
+                }, function(e) {
+                    
+
+                    res.json({status: 1});
+                });
+
+            }
+            else {
+                res.json({ error: "access denied"});
+            }
+        });
+
+    }
+    else {
+        res.joson({
+            error: "access denied"
+        });
+    }
+
+});
+
+
 
 var generateHash = function(password) {
     var salt = bcrypt.genSaltSync(10);
@@ -158,7 +222,7 @@ var findSession = function(sessionId, database, callback) {
 
     collection.find({_id: sessionId}).toArray(function(err, docs) {
         if (!err) {
-            console.log(docs);
+
             if (docs.length > 0) {
                 callback(docs[0]);
             }
