@@ -2,7 +2,7 @@ var express = require('express');
 var database = require('./database.js');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-
+var mongoose = require('mongoose');
 
 
 //
@@ -11,13 +11,6 @@ var cookieParser = require('cookie-parser');
 
 var session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-// var sessionFileStore = require('session-file-store');
-// var ExpressSessionFileStore = sessionFileStore(session);
-
-// var fileStore = new ExpressSessionFileStore({
-//   ttl:3600,
-//   path:'./sessions'
-// });
 
 var app = express();
 
@@ -36,28 +29,35 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
-
 //var urlDatabase = 'mongodb://localhost:27017/todos';
 var urlDatabase =  'mongodb://minibook:123456@ds023373.mlab.com:23373/minibook';
 
-var mongo = require('mongodb');
-var mongoClient = mongo.MongoClient;
+mongoose.connect(urlDatabase);
 
 
-database.connect(urlDatabase, function(err) {
-  if (err) {
-    console.log('Impossible de se connecter à la base de données.'.red);
-    console.log(err);
-    process.exit(1);
-  }
-  else {
-    console.log("Connected correctly to mongo server".green);
-    startServer();
-  }
+app.use(session({
+  secret: '1a9b829823448061ed5931380efc6c6a',
+  resave: true,
+  saveUninitialized: true,
+  store: new MongoStore({ 
+    mongooseConnection: mongoose.connection,
+    ttl: 60 * 60 
+  })
+}));
+
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+  console.log("Connected correctly to mongo server".green);
+
+  startServer();
 });
 
 
 var users = require('./routes/users');
+var posts = require('./routes/posts');
 
 
 
@@ -72,16 +72,6 @@ var startServer = function() {
     });
 
 
-    app.use(session({
-      secret: '1a9b829823448061ed5931380efc6c6a',
-      resave: true,
-      saveUninitialized: true,
-      store: new MongoStore({
-        db: database.get(),
-        ttl: 60 * 60
-      })
-    }));
-
     app.use(function (req, res, next) {
 
       console.log(database);
@@ -92,114 +82,14 @@ var startServer = function() {
 
 
 
-
-
     app.use('/users', users);
+    app.use('/posts', posts);
 
-
-    app.get('/getTasks', function(req, res){
-     
-        res.set('Content-Type', 'application/json');
-
-        var db = database.get();
-        var collection = db.collection("tasks");
-
-        collection.find({}).toArray(function(err, docs) {
-            if (!err) {
-                res.json(JSON.stringify(docs));
-            }
-        });
-    });
-
-    app.post('/createTask', function(req, res) {
-
-        res.set('Content-Type', 'application/json');
-
-        var db = database.get();
-        var collection = db.collection("tasks");
-
-        var newTask = req.body;
-
-        collection.insertOne({
-              label: newTask.label,
-              isCompleted: newTask.isCompleted
-          }, function(err, result) {
-
-            if (err)
-              console.log(err);
-            else {
-              res.json(JSON.stringify(result.insertedId));
-            }
-          });
-    });
-
-
-  app.post('/updateTask', function(req, res) {
-
-        res.set('Content-Type', 'application/json');
-
-        var db = database.get();
-        var collection = db.collection("tasks");
-        var mongo = require('mongodb');
-
-        var newTask = req.body;
-
-        console.log(newTask._id);
-
-        collection.findOneAndUpdate({
-              _id: new mongo.ObjectId(newTask._id)
-          }, {
-            $set: {
-              label: newTask.label,
-              isCompleted: newTask.isCompleted
-            }
-          }, {
-            returnOriginal: false
-          }, function(err, result) {
-
-            if (err)
-              console.log(err);
-            else {
-              res.json(JSON.stringify(result));
-            }
-          });
-    });
-
-    app.post('/deleteTask', function(req, res) {
-
-        res.set('Content-Type', 'application/json');
-
-        var db = database.get();
-        var collection = db.collection("tasks");
-        var mongo = require('mongodb');
-
-        var task = req.body;
-
-
-        collection.findOneAndDelete({
-              _id: new mongo.ObjectId(task._id)
-          }, function(err, result) {
-
-            if (err)
-              console.log(err);
-            else {
-              res.json(JSON.stringify(result));
-            }
-          });
-    });
-
-
-
-
-    
 
     app.use(function(err, req, res, next){
       console.log('Error : ' + err.message);
       next();
     });
-
-
-
 
 
     app.listen(app.get('port'), function(){

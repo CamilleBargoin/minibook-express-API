@@ -25,6 +25,7 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "mongodb": "^2.1.16",
+    "mongoose": "^4.5.2",
     "session-file-store": "^0.2.0"
   }
 }
