@@ -23,7 +23,8 @@ router.post('/register', function(req, res, next) {
                         password: generateHash(req.body.password),
                         created_at: new Date().getTime(),
                         firstname: req.body.firstname,
-                        lastname: req.body.lastname
+                        lastname: req.body.lastname,
+                        role: 1 // user
                     });
 
                     newUser.save(function (err) {
@@ -43,6 +44,7 @@ router.post('/register', function(req, res, next) {
 
                         }
                     });
+
                 }
                 else {
                     // Login already exists in DB
@@ -118,16 +120,68 @@ router.get('/secure', function(req, res, next) {
             res.json({ error: "access denied"});
         }
     });
-
-    
 });
 
+router.get('/secureAdmin', function(req, res, next) {
+
+    console.log("admin secure route: " + req.query.sessionId);
+    sessionService.findSession(req.query.sessionId, function(session) {
+        if (session) {
+
+            var sessionObj = JSON.parse(session.session);
+            usersModel.findOne({_id: sessionObj.userId, role: 2}, function(err, user) {
+                
+                if (user){
+                    res.json({ success: "access granted"});
+                }
+                else {
+
+                    res.json({ error: "access denied"});
+                }
+
+            });
+        }
+        else {
+            res.json({ error: "access denied"});
+        }
+    });
+});
+
+router.post('/all', function(req, res, next) {
+
+    console.log("get all users");
+    console.log(req.body);
+    if (req.params && req.body.sessionId) {
+
+        sessionService.findSession(req.body.sessionId, function(session) {
+            if (session) {
+
+                usersModel.find({}, "-password -__v").populate("friends.user", "firstname lastname avatar").exec(function(err, docs) {
+                    if (!err ) {
+                        res.json(docs);   
+                    }
+                    else {
+                        console.log(err);
+                        res.json({
+                            error: "un problème est survenu"
+                        });
+                    }
+
+                });
+                
+            }
+        });
+    }
+    else {
+        res.json({ error: "accès refusé"});
+    }
+});
 
 router.get('/:id', function(req, res, next) {
     console.log("get user by id");
 
 
-    usersModel.findOne({_id: new ObjectId(req.params.id)}, "-password -__v").populate("friends.user", "firstname lastname").exec(function(err, doc) {
+    usersModel.findOne({_id: new ObjectId(req.params.id)}, "-password -__v").populate("friends.user", "firstname lastname avatar").exec(function(err, doc) {
         if (!err ) {
             res.json(doc);   
         }
@@ -141,11 +195,12 @@ router.get('/:id', function(req, res, next) {
     });
 });
 
+
 router.get('/wall/:id', function(req, res, next) {
     console.log("get user wall by id");
 
 
-    wallsModel.findOne({'user': new ObjectId(req.params.id)}).populate("user posts.created_by posts.comments.created_by", "firstname lastname").exec(function(err, doc) {
+    wallsModel.findOne({'user': new ObjectId(req.params.id)}).populate("user posts.created_by posts.comments.created_by", "firstname lastname avatar").exec(function(err, doc) {
         if (!err ) {
             res.json(doc);   
         }
@@ -162,8 +217,9 @@ router.get('/wall/:id', function(req, res, next) {
 
 router.post("/update", function(req, res, next) {
     console.log("upate user");
-
+console.log(req.body);
     if (req.body && req.body.userId && req.body.sessionId) {
+
 
         sessionService.findSession(req.body.sessionId, function(session) {
             if (session) {
@@ -253,7 +309,7 @@ router.post("/invite", function(req, res, next) {
                         $push: {
                             "friends": {
                                 user: new ObjectId(sessionObj.userId),
-                                status: "request"
+                                status: "pending"
                             }
                         }
                     },
@@ -275,7 +331,7 @@ router.post("/invite", function(req, res, next) {
                                     $push: {
                                         "friends": {
                                             user: new ObjectId(req.body.userId),
-                                            status: "pending"
+                                            status: "sentRequest"
                                         }
                                     }
                                 },
@@ -293,13 +349,8 @@ router.post("/invite", function(req, res, next) {
                                             error: "impossible d'envoyer l'invitation"
                                         });
                                     }
-
                                 }
-
                             );
-
-
-
                             
                         }
                         else {
@@ -376,47 +427,57 @@ router.post("/requests", function(req, res, next) {
 router.post("/befriend", function(req, res, next) {
     console.log("add friends");
 
-    if (req.body && req.body.sessionId) {
+    if (req.body && req.body.sessionId && req.body.friendId) {
 
         sessionService.findSession(req.body.sessionId, function(session) {
 
             if(session) {
 
                 var sessionObj = JSON.parse(session.session);
-                var db = req.db.get();
-                var mongo = require('mongodb');
-                var userCollection = db.collection("users");
 
-                userCollection.findOneAndUpdate({
-                    _id: new mongo.ObjectId(sessionObj.userId)
-                }, {
-                    $push: {
-                        friends: {
-                            _id: new mongo.ObjectId(),
-                            created_at: new Date().getTime(),
-                            userId: req.body.friendId
-                        } 
+
+                usersModel.findById(sessionObj.userId, function (err, user) {
+
+                    if(err) {
+
                     }
-                }, {
-                    returnNewDocument: true
-                }, function(e) {
-                    
+                    else {
 
-                   userCollection.findOneAndUpdate({
-                        _id: new mongo.ObjectId(req.body.friendId)
-                   }, {
-                        $push: {
-                            friends: {
-                                _id: new mongo.ObjectId(),
-                                created_at: new Date().getTime(),
-                                userId: sessionObj.userId
-                            } 
-                        }
-                   }, function(e) {
-                        res.json({status: 1});
-                   });
+                        var friend = user.friends.filter(function (friend) {
+                            return friend.user == req.body.friendId;
+                        }).pop();
+                        
+                        friend.status = "accepted";
+                        user.save(function() {
 
+
+                            usersModel.findById(req.body.friendId, function (err, user) {
+
+                                if(err) {
+
+                                }
+                                else {
+
+                                    var friend = user.friends.filter(function (friend) {
+                                        return friend.user == sessionObj.userId;
+                                    }).pop();
+                                    
+                                    friend.status = "accepted";
+                                    user.save(function() {
+
+                                        res.json({status: 1});
+                                        
+                                    });
+                                }
+                            });
+
+
+                            
+                        });
+                    }
                 });
+
+
             }
             else {
                 res.json({

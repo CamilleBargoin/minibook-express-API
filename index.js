@@ -4,6 +4,9 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 
+var Mailgun = require('mailgun-js');
+
+
 
 //
 // SESSIONS
@@ -29,9 +32,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
+
+
+
 //var urlDatabase = 'mongodb://localhost:27017/todos';
 var urlDatabase =  'mongodb://minibook:123456@ds023373.mlab.com:23373/minibook';
-
 mongoose.connect(urlDatabase);
 
 

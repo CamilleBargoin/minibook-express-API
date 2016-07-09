@@ -11,6 +11,8 @@ var userSchema = new mongoose.Schema({
     firstname: String,
     lastname: String,
     created_at: Date,
+    role: Number, //1: user, 2: admin
+    avatar: String,
     age: Number,
     address: String,
     city: String,
