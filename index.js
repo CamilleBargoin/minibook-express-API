@@ -91,6 +91,10 @@ var startServer = function() {
     app.use('/users', users);
     app.use('/posts', posts);
 
+    app.get('/', function (req, res) {
+      res.send('Hello World!');
+    });
+
 
     app.use(function(err, req, res, next){
       console.log('Error : ' + err.message);
