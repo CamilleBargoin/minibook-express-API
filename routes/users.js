@@ -6,6 +6,7 @@ var mongoose = require("mongoose");
 var usersModel = require("../models/users");
 var wallsModel = require("../models/walls");
 var ObjectId = require('mongoose').Types.ObjectId; 
+var inboxModel = require("../models/inbox");
 
 
 
@@ -40,6 +41,13 @@ router.post('/register', function(req, res, next) {
                             });
 
                             newWall.save();
+
+                            var newInbox = new inboxModel({
+                                user: newUser._id,
+                                messages: []
+                            });
+
+                            newInbox.save();
 
 
                         }
