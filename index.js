@@ -30,7 +30,7 @@ app.set('port', process.env.PORT || '3000');
 var server = require('http').createServer(app);
 
 var io      = require('socket.io')(server);
-server.listen();
+server.listen('80');
 
 app.use(cookieParser());
 
