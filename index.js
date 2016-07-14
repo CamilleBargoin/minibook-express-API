@@ -23,12 +23,11 @@ const MongoStore = require('connect-mongo')(session);
 
 var app = express();
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+// var port = normalizePort(process.env.PORT || '3000');
+app.set('port', process.env.PORT || '3000');
 
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
-var allowedOrigins = "http://localhost:* http://127.0.0.1:* http://minibook-react.herokuapp.com";
 
 var io      = require('socket.io').listen(server);
 
@@ -45,10 +44,6 @@ io.configure('production', function(){
 });
 
 server.listen(process.env.PORT || 3000);
-
-var sio_server = io(server, {
-    origins: allowedOrigins
-});
 
 
 app.use(cookieParser());
