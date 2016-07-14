@@ -29,19 +29,21 @@ app.set('port', process.env.PORT || '3000');
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
 
-var io      = require('socket.io').listen(server);
+var io      = require('socket.io')({
+  'origins': 'http://minibook-react.herokuapp.com:*'
+}).listen(server);
 
-io.configure('production', function(){
-    console.log("Server in production mode");
-    io.enable('browser client minification');  // send minified client
-    io.enable('browser client etag'); // apply etag caching logic based on version number
-    io.enable('browser client gzip'); // the file
-    io.set('log level', 1);           // logging
-    io.set('transports', [            // all transports (optional if you want flashsocket)
-        'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
-    ]);
-    io.set('origins', 'http://minibook-react.herokuapp.com:*');
-});
+// io.configure('production', function(){
+//     console.log("Server in production mode");
+//     io.enable('browser client minification');  // send minified client
+//     io.enable('browser client etag'); // apply etag caching logic based on version number
+//     io.enable('browser client gzip'); // the file
+//     io.set('log level', 1);           // logging
+//     io.set('transports', [            // all transports (optional if you want flashsocket)
+//         'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
+//     ]);
+//     io.set('origins', 'http://minibook-react.herokuapp.com:*');
+// });
 
 server.listen(process.env.PORT || 3000);
 
