@@ -8,6 +8,7 @@ var Mailgun = require('mailgun-js');
 
 
 
+
 //
 // SESSIONS
 //
@@ -16,7 +17,8 @@ var session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 var app = express();
-
+var server  = app.listen(1337);
+var io      = require('socket.io').listen(server);
 
 
 app.use(cookieParser());
@@ -32,10 +34,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
-
-
-
-//var urlDatabase = 'mongodb://localhost:27017/todos';
 var urlDatabase =  'mongodb://minibook:123456@ds023373.mlab.com:23373/minibook';
 mongoose.connect(urlDatabase);
 
@@ -61,7 +59,7 @@ db.once('open', function() {
 });
 
 
-var users = require('./routes/users');
+var users = require('./routes/users')(io);
 var messages = require('./routes/messages');
 var posts = require('./routes/posts');
 var quotes = require('./routes/quotes');
@@ -77,6 +75,7 @@ var startServer = function() {
       // res.header("Access-Control-Allow-Origin", "https://minibook-react.herokuapp.com");
       // res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      res.header('Access-Control-Allow-Credentials', 'true');
       next();
     });
 
@@ -88,7 +87,6 @@ var startServer = function() {
       // req.session = session;
       next();
     });
-
 
 
     app.use('/users', users);

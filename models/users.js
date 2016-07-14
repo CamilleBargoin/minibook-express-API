@@ -16,6 +16,7 @@ var userSchema = new mongoose.Schema({
     age: Number,
     address: String,
     city: String,
+    online: { type: Boolean, default: false},
     friends: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
