@@ -8,6 +8,11 @@ var Mailgun = require('mailgun-js');
 
 
 
+    
+
+
+
+
 
 //
 // SESSIONS
@@ -22,9 +27,10 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 // var server = app.listen("3001");
-var server = app.listen(port);
+var server = require('http').createServer(app);
 
 var io      = require('socket.io').listen(server);
+server.listen(process.env.PORT || 3000);
 
 
 app.use(cookieParser());
