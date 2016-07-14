@@ -668,14 +668,9 @@ module.exports = function(io) {
 
     var socketLogin = null;
     var socketLogout = null;
-    var clients = [];
 
     io.on("connection", function(socket) {
         console.log("NOUVELLE CONNEXION");
-
-
-        clients.push(socket.id);
-        console.log(clients);
 
 
         // clients automatically join a room named after their user id.
@@ -683,7 +678,6 @@ module.exports = function(io) {
             socket.join(room);
             // io.sockets.in(room).emit('message', 'what is going on, ' + room);
         });
-
 
         socketLogin = function(loggedInUser) {
 
