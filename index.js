@@ -29,9 +29,7 @@ app.set('port', process.env.PORT || '3000');
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
 
-var io      = require('socket.io')({
-  'origins': 'http://minibook-react.herokuapp.com:*'
-}).listen(server);
+var io      = require('socket.io').listen(server);
 
 // io.configure('production', function(){
 //     console.log("Server in production mode");

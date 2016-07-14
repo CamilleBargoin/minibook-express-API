@@ -672,6 +672,11 @@ module.exports = function(io) {
     io.on("connection", function(socket) {
         console.log("NOUVELLE CONNEXION");
 
+        io.set('transports', [            // all transports (optional if you want flashsocket)
+            'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
+        ]);
+        io.set('origins', 'http://minibook-react.herokuapp.com:*');
+
 
         // clients automatically join a room named after their user id.
         socket.on('room', function(room) {
