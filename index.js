@@ -64,6 +64,7 @@ db.once('open', function() {
 var users = require('./routes/users');
 var messages = require('./routes/messages');
 var posts = require('./routes/posts');
+var quotes = require('./routes/quotes');
 
 
 
@@ -72,9 +73,9 @@ var startServer = function() {
   console.log("start server");
 
     app.use(function(req, res, next) {
-      // res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-      res.header("Access-Control-Allow-Origin", "https://minibook-react.herokuapp.com");
-      res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
+      res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+      // res.header("Access-Control-Allow-Origin", "https://minibook-react.herokuapp.com");
+      // res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
@@ -93,6 +94,7 @@ var startServer = function() {
     app.use('/users', users);
     app.use('/posts', posts);
     app.use('/messages', messages);
+    app.use('/quotes', quotes);
 
     app.get('/', function (req, res) {
       res.send('Hello World!');

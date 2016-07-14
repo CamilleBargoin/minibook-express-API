@@ -56,19 +56,19 @@ router.post("/create", function(req, res, next) {
 
             if(session) {
 
+                var newPost = {created_at: new Date().getTime(), body: req.body.post.body, created_by: new ObjectId(req.body.post.created_by.userId)};
+                
                 wallsModel.findOneAndUpdate(
                     {user: new ObjectId(req.body.target)},
-                    {$push: {"posts": {created_at: new Date().getTime(), body: req.body.post.body, created_by: new ObjectId(req.body.post.created_by.userId)}}},
-                    {safe: true, new : true},
-                    function(err, model) {
+                    {$push: {"posts": {$each: [newPost], $position: 0 }}},
+                    {safe: true, new : true}).populate('posts.created_by', 'firstname lastname avatar').sort().exec(function(err, model) {
 
                         if (!err)
-                            res.json({status: 1});
+                            res.json({data: model });
                         else {
                             console.log(err);
                         }
-                    }
-                );
+                    });
             }
             else {
                 res.json({
@@ -103,11 +103,12 @@ router.post("/addComment", function(req, res, next) {
                 wallsModel.findOneAndUpdate(
                     {"posts._id": new ObjectId(req.body.postId)},
                     {$push: {"posts.$.comments": {created_at: new Date().getTime(), body: newComment.body, created_by: new ObjectId(newComment.created_by.userId)}}},
-                    {safe: true, new : true},
-                    function(err, model) {
+                    {safe: true, new : true}
+                ).populate('posts.created_by', 'firstname lastname avatar').populate('posts.comments.created_by', 'firstname lastname')
+                .exec(function(err, model) {
 
                         if (!err)
-                            res.json({status: 1});
+                            res.json({data: model});
                         else {
                             console.log(err);
                         }
