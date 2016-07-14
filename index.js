@@ -28,9 +28,14 @@ app.set('port', port);
 
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
+var allowedOrigins = "http://localhost:* http://127.0.0.1:* http://minibook-react.herokuapp.com";
 
 var io      = require('socket.io').listen(server);
 server.listen(process.env.PORT || 3000);
+
+var sio_server = io(server, {
+    origins: allowedOrigins
+});
 
 
 app.use(cookieParser());
@@ -70,7 +75,7 @@ db.once('open', function() {
 });
 
 
-var users = require('./routes/users')(io);
+var users = require('./routes/users')(sio_server);
 var messages = require('./routes/messages');
 var posts = require('./routes/posts');
 var quotes = require('./routes/quotes');
