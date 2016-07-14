@@ -17,10 +17,12 @@ var session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 var app = express();
-app.set('port', process.env.PORT || 3000);
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
 
 // var server = app.listen("3001");
-var server = app.listen();
+var server = app.listen(port);
 
 var io      = require('socket.io').listen(server);
 
