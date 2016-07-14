@@ -31,6 +31,19 @@ var server = require('http').createServer(app);
 var allowedOrigins = "http://localhost:* http://127.0.0.1:* http://minibook-react.herokuapp.com";
 
 var io      = require('socket.io').listen(server);
+
+io.configure('production', function(){
+    console.log("Server in production mode");
+    io.enable('browser client minification');  // send minified client
+    io.enable('browser client etag'); // apply etag caching logic based on version number
+    io.enable('browser client gzip'); // the file
+    io.set('log level', 1);           // logging
+    io.set('transports', [            // all transports (optional if you want flashsocket)
+        'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
+    ]);
+    io.set('origins', 'http://minibook-react.herokuapp.com:*');
+});
+
 server.listen(process.env.PORT || 3000);
 
 var sio_server = io(server, {
@@ -75,7 +88,7 @@ db.once('open', function() {
 });
 
 
-var users = require('./routes/users')(sio_server);
+var users = require('./routes/users')(io);
 var messages = require('./routes/messages');
 var posts = require('./routes/posts');
 var quotes = require('./routes/quotes');
