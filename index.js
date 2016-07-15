@@ -33,8 +33,8 @@ var io      = require('socket.io')(server);
 // var io = require('socket.io').listen(app.listen(process.env.PORT));
 app.use(cookieParser());
 
-io.set('origins', '*:*');
-io.set('match origin protocol', true);
+// io.set('origins', '*:*');
+// io.set('match origin protocol', true);
 
  io.on("connection", function(socket) {
         console.log("NOUVELLE CONNEXION");
@@ -88,9 +88,9 @@ var startServer = function() {
     app.use(function(req, res, next) {
       // res.header("Access-Control-Allow-Origin", "http://localhost:8080");
       // res.header("Access-Control-Allow-Origin", "https://minibook-react.herokuapp.com");
-      res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
+      res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      res.header('Access-Control-Allow-Credentials', 'true');
+      // res.header('Access-Control-Allow-Credentials', 'true');
       next();
     });
 
