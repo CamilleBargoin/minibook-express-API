@@ -4,8 +4,8 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 
-var api_key = 'key-fa9f7f108b293cdd20424ad9bdd4c768';
-var domain = 'app11723c5623094bde8c357cc8ea3473bc.mailgun.org';
+var api_key = process.env.MAILGUN_API_KEY;
+var domain = 'sandboxa363937e43a148799d0ea8ce040f6e43.mailgun.org';
 var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
 
 //
