@@ -31,6 +31,9 @@ var server = require('http').createServer(app);
 
 var io      = require('socket.io')(server);
 // var io = require('socket.io').listen(app.listen(process.env.PORT));
+// 
+ io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'htmlfile', 'flashsocket']);
+    io.set('origins', '*:*');
 app.use(cookieParser());
 
 // io.set('origins', '*:*');
