@@ -91,7 +91,7 @@ var startServer = function() {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "X-Requested-With");
       // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // res.header('Access-Control-Allow-Credentials', 'false');
+      res.header('Access-Control-Allow-Credentials', 'false');
       next();
     });
 
