@@ -29,9 +29,8 @@ app.set('port', process.env.PORT || '3000');
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
 
-var io      = require('socket.io')(server);
-// server.listen('80');
-
+// var io      = require('socket.io')(server);
+var io = require('socket.io').listen(app.listen(process.env.PORT));
 app.use(cookieParser());
 
 //  io.on("connection", function(socket) {
