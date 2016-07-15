@@ -7,6 +7,13 @@ var mongoose = require('mongoose');
 var Mailgun = require('mailgun-js');
 
 
+
+    
+
+
+
+
+
 //
 // SESSIONS
 //
@@ -21,17 +28,19 @@ app.set('port', process.env.PORT || '3000');
 
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
-var io      = require('socket.io').listen();
+
+var io      = require('socket.io')(server);
+// server.listen('80');
 
 app.use(cookieParser());
 
-// io.on("connection", function(socket) {
+//  io.on("connection", function(socket) {
 //         console.log("NOUVELLE CONNEXION");
 
 //         io.set('transports', [            // all transports (optional if you want flashsocket)
 //             'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'
 //         ]);
-//         io.set('origins', 'http://minibook-react.herokuapp.com');
+//         io.set('origins', 'http://minibook-react.herokuapp.com:*');
 // });
 
 
