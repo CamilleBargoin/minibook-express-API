@@ -4,9 +4,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 
-var api_key = process.env.MAILGUN_API_KEY;
-var domain = 'sandboxa363937e43a148799d0ea8ce040f6e43.mailgun.org';
-var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+
 
 //
 // SESSIONS
@@ -74,16 +72,7 @@ var startServer = function() {
 
   console.log("start server");
 
-  var data = {
-  from: 'Excited User <me@samples.mailgun.org>',
-  to: 'cbargoin@gmail.com',
-  subject: 'Hello',
-  text: 'Testing some Mailgun awesomness!'
-};
- 
-mailgun.messages().send(data, function (error, body) {
-  console.log(body);
-});
+  
 
     app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "http://localhost:8080");

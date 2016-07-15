@@ -12,6 +12,10 @@ module.exports = function(io) {
     var ObjectId = require('mongoose').Types.ObjectId; 
     var inboxModel = require("../models/inbox");
 
+    var api_key = process.env.MAILGUN_API_KEY;
+    var domain = process.env.MAILGUN_DOMAIN;
+    var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+
 
     router.post('/register', function(req, res, next) {
 
@@ -56,6 +60,17 @@ module.exports = function(io) {
                                     console.log("NEW USER");
                                     req.socket.emit("newUser", {user: newUser});
                                 }
+
+                                var data = {
+                                  from: 'Minibook <admin@minibook.com>',
+                                  to: newUser.email,
+                                  subject: 'Minibook',
+                                  text: 'Bienvenue sur Minibook !'
+                                };
+                                 
+                                mailgun.messages().send(data, function (error, body) {
+                                  console.log(body);
+                                });
 
 
                             }
