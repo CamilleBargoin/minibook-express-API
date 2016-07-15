@@ -4,15 +4,9 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 
-var Mailgun = require('mailgun-js');
-
-
-
-    
-
-
-
-
+var api_key = 'key-fa9f7f108b293cdd20424ad9bdd4c768';
+var domain = 'app11723c5623094bde8c357cc8ea3473bc.mailgun.org';
+var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
 
 //
 // SESSIONS
@@ -28,21 +22,13 @@ app.set('port', process.env.PORT || '3000');
 
 // var server = app.listen("3001");
 var server = require('http').createServer(app);
-
 var io      = require('socket.io')(server);
-// var io = require('socket.io').listen(app.listen(process.env.PORT));
-// 
- io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'htmlfile', 'flashsocket']);
-    io.set('origins', '*:*');
+ 
+ 
 app.use(cookieParser());
 
 // io.set('origins', '*:*');
 // io.set('match origin protocol', true);
-
- io.on("connection", function(socket) {
-        console.log("NOUVELLE CONNEXION");
-});
-
 
 app.use(express.static(__dirname + '/public'));
 
@@ -88,8 +74,20 @@ var startServer = function() {
 
   console.log("start server");
 
+  var data = {
+  from: 'Excited User <me@samples.mailgun.org>',
+  to: 'cbargoin@gmail.com',
+  subject: 'Hello',
+  text: 'Testing some Mailgun awesomness!'
+};
+ 
+mailgun.messages().send(data, function (error, body) {
+  console.log(body);
+});
+
     app.use(function(req, res, next) {
-      res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
+      res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+      // res.header("Access-Control-Allow-Origin", "http://minibook-react.herokuapp.com");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       res.header("Access-Control-Allow-Credentials", 'true');
       next();
