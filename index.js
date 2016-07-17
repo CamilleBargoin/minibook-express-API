@@ -58,7 +58,7 @@ app.use(session({
   saveUninitialized: true,
   store: new MongoStore({ 
     mongooseConnection: mongoose.connection,
-    ttl: 60 * 60 
+    ttl: 60 * 60 *2
   })
 }));
 
@@ -76,6 +76,7 @@ db.once('open', function() {
 var users = require('./routes/users')(io);
 var messages = require('./routes/messages');
 var posts = require('./routes/posts');
+var discussions = require('./routes/discussions');
 var quotes = require('./routes/quotes');
 
 
@@ -108,6 +109,8 @@ var startServer = function() {
     app.use('/posts', posts);
     app.use('/messages', messages);
     app.use('/quotes', quotes);
+    app.use('/discussions', discussions);
+
 
     app.get('/', function (req, res) {
       res.send('Hello World!');
