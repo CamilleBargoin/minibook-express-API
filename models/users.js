@@ -14,6 +14,7 @@ var userSchema = new mongoose.Schema({
     role: Number, //1: user, 2: admin
     avatar: String,
     age: Number,
+    gender: {type: String, enum: ['male', 'female']},
     address: String,
     city: String,
     online: { type: Boolean, default: false},

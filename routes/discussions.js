@@ -44,7 +44,7 @@ router.post('/open', function(req, res, next) {
                             participants: [req.body.target, sessionObj.userId],
                             messages: []
                         };
-                        discussionModel.create(newDiscussion, function(err, model) {
+                        discussionModel.create(newDiscussion).populate("messages.created_by", "firstname lastname avatar").exec( function(err, model) {
                             if (err) {
                                 console.log(err);
                             }
@@ -53,7 +53,7 @@ router.post('/open', function(req, res, next) {
                                     discussion: model
                                 });
                             }
-                        })
+                        });
                         console.log("NEW DOCU");
                     }
                   }
@@ -89,7 +89,7 @@ router.post('/get', function(req, res, next) {
 
             if(session) {
 
-                discussionModel.findById(req.body.discussionId, function(err, model) {
+                discussionModel.findById(req.body.discussionId).populate("messages.created_by", "firstname lastname avatar").exec(function(err, model) {
                   
                   if (err) {
                     console.log(err);

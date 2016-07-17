@@ -150,9 +150,9 @@ module.exports = function(io) {
         if (req.body && req.body.email && req.body.password) {
 
            
-            usersModel.findOne({email: req.body.email}, function(err, doc) {
+            usersModel.findOne({email: req.body.email, role: {$in: [1, 2]}}, function(err, doc) {
 
-                if (!err ) {
+                if (!err && doc) {
 
                     if (validPassword(req.body.password, doc.password)) {
                         loggedInUser = doc;
@@ -177,12 +177,12 @@ module.exports = function(io) {
                         
                     }
                     else {
-                        req.session.customInfo = "Identifiant et/ou mot de passe incorrect(s)";
+                        // req.session.customInfo = "Identifiant et/ou mot de passe incorrect(s)";
                         res.redirect("/");
                     }
                 }
                 else {
-                    console.log(err);
+                    res.redirect("/");
                 }
             });
         }
@@ -212,7 +212,7 @@ module.exports = function(io) {
 
                 var sessionObj = JSON.parse(session.session);
                 usersModel.findOne({_id: sessionObj.userId, role: 2}, function(err, user) {
-                    
+                    console.log(sessionObj.userId);
                     if (user){
                         res.json({ success: "access granted"});
                     }
@@ -394,7 +394,7 @@ module.exports = function(io) {
                 if (session) {
 
                     usersModel.find({
-                        firstname: {$regex : ".*" + req.body.string + ".*"}
+                        firstname: {$regex : ".*" + req.body.string + ".*", $options: "i"}
                     }, "_id firstname lastname", function(err, docs) {
                         if (err) {
 

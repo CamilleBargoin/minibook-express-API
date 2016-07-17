@@ -84,7 +84,7 @@ var quotes = require('./routes/quotes');
 var startServer = function() {
 
   console.log("start server");
-console.log(process.env);
+
 
     app.use(function(req, res, next) {
       if (process.env.NODE_ENV) {

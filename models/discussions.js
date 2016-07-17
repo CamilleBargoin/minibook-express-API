@@ -4,11 +4,13 @@ var findOrCreate = require('mongoose-findorcreate');
 
 var discussionSchema = new mongoose.Schema({
     participants: [{
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users'
     }],
     messages: [{
         created_by: {
-                type: mongoose.Schema.Types.ObjectId
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'users'
         },
         body: String,
         created_at: Date
