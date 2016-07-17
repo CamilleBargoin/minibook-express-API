@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 
 
-
 //
 // SESSIONS
 //
@@ -15,13 +14,26 @@ const MongoStore = require('connect-mongo')(session);
 
 var app = express();
 
+
+
+
 // var port = normalizePort(process.env.PORT || '3000');
 app.set('port', process.env.PORT || '3000');
 
 // var server = app.listen("3001");
-var server = require('http').createServer(app);
-var io      = require('socket.io')(server);
+// var server = require('http').createServer(app);
+// var io      = require('socket.io')(server);
+var port = process.env.PORT || 3000;
+var io = require('socket.io').listen(app.listen(app.get('port'), function(){
+      console.log('Express started on http://localhost:' +
+        app.get('port') + '; press Ctrl-C to terminate');
+    }));
  
+
+// io.on('connection', function (socket) {
+// console.log(" CA MARCHE");
+
+// });
  
 app.use(cookieParser());
 
@@ -72,7 +84,6 @@ var startServer = function() {
 
   console.log("start server");
 
-  
 
     app.use(function(req, res, next) {
       // res.header("Access-Control-Allow-Origin", "http://localhost:8080");
@@ -109,9 +120,9 @@ var startServer = function() {
     });
 
 
-    app.listen(app.get('port'), function(){
-      console.log('Express started on http://localhost:' +
-        app.get('port') + '; press Ctrl-C to terminate');
-    });
+    // app.listen(app.get('port'), function(){
+    //   console.log('Express started on http://localhost:' +
+    //     app.get('port') + '; press Ctrl-C to terminate');
+    // });
 
 };

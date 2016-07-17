@@ -192,13 +192,14 @@ module.exports = function(io) {
     router.get('/secure', function(req, res, next) {
 
         console.log("secure route: " + req.query.sessionId);
+        console.log(process.env.PORT);
         sessionService.findSession(req.query.sessionId, function(session) {
             if (session) {
 
-                res.json({ success: "access granted"});
+                res.json({ success: "access granted", port: process.env.PORT});
             }
             else {
-                res.json({ error: "access denied"});
+                res.json({ error: "access denied", port: process.env.PORT});
             }
         });
     });
@@ -262,18 +263,29 @@ module.exports = function(io) {
         console.log("get user by id");
 
 
-        usersModel.findOne({_id: new ObjectId(req.params.id)}, "-password -__v").populate("friends.user", "firstname lastname avatar online").exec(function(err, doc) {
-            if (!err ) {
-                res.json(doc);   
+        sessionService.findSession(req.query.sessionId, function(session) {
+            if (session) {
+
+                usersModel.findOne({_id: new ObjectId(req.params.id)}, "-password -__v").populate("friends.user", "firstname lastname avatar online").exec(function(err, doc) {
+                    if (!err ) {
+                        res.json(doc);   
+                    }
+                    else {
+                        console.log(err);
+                        res.json({
+                            error: "utilisateur introuvable"
+                        });
+                    }
+
+                });
+                
             }
             else {
-                console.log(err);
-                res.json({
-                    error: "utilisateur introuvable"
-                });
+                res.json({ error: "access denied"});
             }
-
         });
+
+
     });
 
 
