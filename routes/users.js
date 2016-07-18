@@ -695,6 +695,7 @@ module.exports = function(io) {
 
     var socketLogin = null;
     var socketLogout = null;
+    var socketNewFriend = null;
 
     io.on("connection", function(socket) {
         console.log("NOUVELLE CONNEXION");
